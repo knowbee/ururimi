@@ -20,19 +20,23 @@ def app():
 
 def scrape(t, f):
     start = 0
-    end = 6168
+    end = 20
     while(start < end):
-        with urlopen(t + str(start), data=None, timeout=1000) as page:
-            soup = bsf(page, 'html.parser')
-            words = soup.findAll("li", attrs={"class": "entry"})
-            with tqdm(total=len(f)) as pbar:
-                for title in words:
-                    time.sleep(0.1)
-                    pbar.update(5)
-                    pbar.desc = 'scraping'
-                    f.update({title.find("span", attrs={"class": "lemma"}).text: title.find(
-                        "span", attrs={"class": "meaning"}).text})
-            start += 10
-    print(f"'size': {len(f)}")
-    with open('amagambo.json', 'w') as file:
-        json.dump(f, file)
+        try:
+            with urlopen(t + str(start), data=None, timeout=1000) as page:
+                soup = bsf(page, 'html.parser')
+                words = soup.findAll("li", attrs={"class": "entry"})
+                with tqdm(total=len(f)) as pbar:
+                    for title in words:
+                        time.sleep(0.1)
+                        pbar.update(5)
+                        pbar.desc = 'scraping'
+                        f.update({title.find("span", attrs={"class": "lemma"}).text: title.find(
+                            "span", attrs={"class": "meaning"}).text})
+                start += 10
+        except ConnectionResetError:
+            pass
+        finally:
+            print(f"'size': {len(f)}")
+            with open('amagambo.json', 'w') as file:
+                json.dump(f, file)
