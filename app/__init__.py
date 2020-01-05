@@ -20,7 +20,7 @@ def app():
 
 def scrape(t, f):
     start = 0
-    end = 20
+    end = 6168
     while(start < end):
         try:
             with urlopen(t + str(start), data=None, timeout=1000) as page:
@@ -28,15 +28,32 @@ def scrape(t, f):
                 words = soup.findAll("li", attrs={"class": "entry"})
                 with tqdm(total=len(f)) as pbar:
                     for title in words:
-                        time.sleep(0.1)
-                        pbar.update(5)
+                        # time.sleep(0.1)
+                        pbar.update(len(f) / 0.1)
                         pbar.desc = 'scraping'
-                        f.update({title.find("span", attrs={"class": "lemma"}).text: title.find(
-                            "span", attrs={"class": "meaning"}).text})
+                        prefix = f"{title.find('span', attrs={'class': 'prefix'}).text}"
+                        lemma = f"{title.find('span', attrs={'class': 'lemma'}).text}"
+                        modifier = f"({title.find('span', attrs={'class': 'modifier'}).text})"
+                        meaning = f"{title.find('span', attrs={'class': 'meaning'}).text}"
+                        ijambo = prefix + lemma + modifier
+                        f.update(
+                            {ijambo: meaning})
+
                 start += 10
-        except ConnectionResetError:
-            pass
+        except AttributeError:
+            for title in words:
+                try:
+                    prefix = f"{title.find('span', attrs={'class': 'prefix'}).text}"
+                except AttributeError:
+                    prefix = ""
+                lemma = title.find(
+                    "span", attrs={"class": "lemma"}).text
+                meaning = title.find(
+                    "span", attrs={"class": "meaning"}).text
+                f.update({prefix + lemma: meaning})
+
+            start += 10
         finally:
-            print(f"'size': {len(f)}")
             with open('amagambo.json', 'w') as file:
                 json.dump(f, file)
+            print(f"{len(f)}")
