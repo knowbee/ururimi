@@ -1,4 +1,4 @@
-# amagambo
+# ururimi
 
 ## setup
 
