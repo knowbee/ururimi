@@ -7,11 +7,11 @@ pip3 install pipenv
 ```
 
 ```cli
-git clone https://github.com/knowbee/amagambo
+git clone https://github.com/knowbee/ururimi
 ```
 
 ```cli
-cd amagambo
+cd ururimi
 ```
 
 ```cli
